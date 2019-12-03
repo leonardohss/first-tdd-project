@@ -48,6 +48,63 @@ namespace CursoOnline.DominioTest.Cursos
             */
             cursoEsperado.ToExpectedObject().ShouldMatch(curso);//necessário instalat a extensão ExpectedObjects e declarar o namespace
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void NaoDeveCursoTerUmNomeInvalido(string nomeInvalido)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950.00
+            };
+
+            var message = Assert.Throws<ArgumentException>(() => new Curso(nomeInvalido, cursoEsperado.CargaHoraria,
+                cursoEsperado.PublicoAlvo, cursoEsperado.Valor)).Message;
+            Assert.Equal("Nome inválido", message);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void NaoDeveCursoTerUmaCargaHorariaMenorQue1(double cargaHorariaInvalida)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950.00
+            };
+
+            var message = Assert.Throws<ArgumentException>(() => new Curso(cursoEsperado.Nome, cargaHorariaInvalida,
+                cursoEsperado.PublicoAlvo, cursoEsperado.Valor)).Message;
+
+            Assert.Equal("Carga horária inválida", message);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void NaoDeveCursoTerUmValorMenorQue1(double valorInvalido)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950.00
+            };
+
+            var message = Assert.Throws<ArgumentException>(() => new Curso(cursoEsperado.Nome, cursoEsperado.CargaHoraria,
+                cursoEsperado.PublicoAlvo, valorInvalido)).Message;
+
+            Assert.Equal("Valor inválido", message);
+        }
+
     }
 
     public enum PublicoAlvo
@@ -67,6 +124,21 @@ namespace CursoOnline.DominioTest.Cursos
 
         public Curso(string nome, double cargaHoraria, PublicoAlvo publicoAlvo, double valor)
         {
+            if (string.IsNullOrEmpty(nome))
+            {
+                throw new ArgumentException("Nome inválido");
+            }
+
+            if (cargaHoraria < 1)
+            {
+                throw new ArgumentException("Carga horária inválida");
+            }
+
+            if (valor < 1)
+            {
+                throw new ArgumentException("Valor inválido");
+            }
+
             Nome = nome;
             CargaHoraria = cargaHoraria;
             PublicoAlvo = publicoAlvo;
